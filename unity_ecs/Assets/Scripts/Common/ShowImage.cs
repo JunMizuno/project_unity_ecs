@@ -17,6 +17,9 @@ public class ShowImage : MonoBehaviour
     [SerializeField]
     private RawImage rawImage;
 
+    [SerializeField]
+    private String imageName;
+
     private bool isBuiltinImage = true;
 
     async void Start()
