@@ -5,6 +5,8 @@ using UnityEngine.UI;
 using UniRx;
 using Cysharp.Threading.Tasks;
 using System;
+using UnityEngine.AddressableAssets;
+using UnityEngine.Experimental.Rendering.RenderGraphModule;
 
 public class ShowImage : MonoBehaviour
 {
@@ -20,22 +22,113 @@ public class ShowImage : MonoBehaviour
     [SerializeField]
     private String imageName;
 
-    private bool isBuiltinImage = true;
+    [SerializeField]
+    private bool rawImageTypeA = false;
+    
+    [SerializeField]
+    private bool rawImageTypeB = false;
+
+    private bool isBuiltinImage = false;
+
+    private bool isButtonTapped = false;
 
     async void Start()
     {
-        if (image == null)
+        await UniTask.Delay(TimeSpan.FromSeconds(1f));
+
+        Debug.Log($"DelayTest:{1}second(s)");
+
+        if (!rawImageTypeA && !rawImageTypeB)
         {
-            isBuiltinImage = false;
+            isBuiltinImage = true;
+            AddButtonEventForImage();
+            
+            Debug.Log($"BuiltinImage");
         }
 
-        await UniTask.Delay(TimeSpan.FromSeconds(3f));
+        if (!isBuiltinImage)
+        {
+            AddButtonEventForRawImage();
 
-        Debug.Log($"DelayTest:{0}");
+            Debug.Log($"RawImageA:{rawImageTypeA}, RawImageB:{rawImageTypeB}");
+        }
     }
 
     void Update()
     {
-        
+
+    }
+
+    private void AddButtonEventForImage()
+    {
+        if (button == null)
+        {
+            return;
+        }
+
+        button.OnClickAsObservable()
+            .Subscribe(async _ => 
+            {
+                if (isButtonTapped)
+                {
+                    return;
+                }
+
+                if (image == null)
+                {
+                    return;
+                }
+
+                isButtonTapped = true;
+
+                var downloadSize = await Addressables.GetDownloadSizeAsync("ushi_texas_tornado").Task;
+                Debug.Log($"downloadSize:{downloadSize}");
+                
+                var loadedSprite = await Addressables.LoadAssetAsync<Texture2D>("ushi_texas_tornado").Task;
+                if (loadedSprite != null)
+                {
+                    var sprite = Sprite.Create(loadedSprite, new Rect(0, 0, loadedSprite.width, loadedSprite.height), new Vector2(0.5f, 0.5f));
+                    image.sprite = sprite;
+                }
+                else
+                {
+                    Debug.Log($"Image is null");
+                }
+
+                await UniTask.Delay(TimeSpan.FromSeconds(2f));
+
+                isButtonTapped = false;
+            })
+            .AddTo(this);
+    }
+
+    private void AddButtonEventForRawImage()
+    {
+        if (button == null)
+        {
+            return;
+        }
+
+        button.OnClickAsObservable()
+            .Subscribe(async _ =>
+            {
+                if (isButtonTapped)
+                {
+                    return;
+                }
+
+                isButtonTapped = true;
+
+                var downloadSize = await Addressables.GetDownloadSizeAsync("ushi_texas_tornado").Task;
+                if (downloadSize > 0)
+                {
+
+                }
+
+                await UniTask.Delay(TimeSpan.FromSeconds(2f));
+
+                isButtonTapped = false;
+            })
+            .AddTo(this);
     }
 }
