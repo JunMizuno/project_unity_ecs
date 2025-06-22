@@ -8,7 +8,7 @@ using System;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Experimental.Rendering.RenderGraphModule;
 
-public class ShowImage : MonoBehaviour
+public sealed class ShowImage : MonoBehaviour
 {
     [SerializeField]
     private Button button;
@@ -32,7 +32,7 @@ public class ShowImage : MonoBehaviour
 
     private bool isButtonTapped = false;
 
-    async void Start()
+    private async void Start()
     {
         await UniTask.Delay(TimeSpan.FromSeconds(1f));
 
@@ -54,7 +54,12 @@ public class ShowImage : MonoBehaviour
         }
     }
 
-    void Update()
+    private void Update()
+    {
+
+    }
+
+    private void OnDestroy()
     {
 
     }

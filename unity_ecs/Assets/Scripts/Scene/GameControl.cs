@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameControl : MonoBehaviour
+public sealed class GameControl : MonoBehaviour
 {
     private static GameControl instance;
     private static readonly string CLASS_NAME = "GameControlScene";
